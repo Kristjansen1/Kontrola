@@ -4,4 +4,20 @@
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="options_menu_settings">Settings</string>
     <string name="options_menu_export">Export to table</string>
+    <string name="fragment_add_error_hint_datum">Datum</string>
+    <string name="fragment_add_error_hint_serijska">Serijska</string>
+    <string name="fragment_add_error_txt_vrsta_napake">Vrsta napake:</string>
+    <string name="fragment_add_error_txt_opomba">Opomba:</string>
+    <string name="fragment_add_error_hint_posel">Posel</string>
+    <string name="fragment_add_error_imgcntdesc">calendar selection</string>
+    <string name="fragment_home_add_error_imgcntdesc">add error icon</string>
+
+    <string-array name="planets_array">
+        <item>CEE Priklop</item>
+        <item>Razdelilec</item>
+        <item>Kabli</item>
+        <item>Vezava Razvodnice</item>
+        <item>Finomontaža</item>
+        <item>Kanal</item>
+    </string-array>
 </resources>

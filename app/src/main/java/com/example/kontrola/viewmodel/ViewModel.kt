@@ -6,10 +6,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.viewModelFactory
-import androidx.room.Database
 import com.example.kontrola.database.AppDatabase
-import com.example.kontrola.database.ErrorDao
 import com.example.kontrola.model.Error1
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -20,25 +17,28 @@ class ViewModel(application: Application): AndroidViewModel(application) {
 
     val allError: LiveData<List<Error1>> = appDatabase.errorDao().getAllData()
 
-    private val _editIcon = MutableLiveData<Boolean>()
-    val editIcon: LiveData<Boolean> = _editIcon
+    private val _itemAddEdit = MutableLiveData<Error1?>()
+    val itemAddEdit: MutableLiveData<Error1?> = _itemAddEdit
 
 
-    val _x = MutableLiveData<String>()
-    val x: LiveData<String> = _x
 
     init {
         Log.d("viewmodel","init")
     }
 
-    fun setEditIconVisible(visible: Boolean) {
-        _editIcon.value = visible
+    fun setItemAddEdit(item: Error1?) {
+        _itemAddEdit.value = item
     }
-    fun addError(errorList: ArrayList<Error1>) {
+    fun addError(error: Error1) {
         viewModelScope.launch(Dispatchers.IO) {
-            appDatabase.errorDao().insert(errorList)
+            appDatabase.errorDao().insert(error)
         }
 
+    }
+    fun deleteError(error: Error1) {
+        viewModelScope.launch(Dispatchers.IO) {
+            appDatabase.errorDao().delete(error)
+        }
     }
 
 }

@@ -58,12 +58,7 @@ class MainActivity : AppCompatActivity() {
                 n.navigate(R.id.action_homeFragment_to_settingsFragment)
                 true
             }
-            R.id.editItem -> {
-                Log.d("applog","edit clicked")
-                return true
-
-            }
-            else -> super.onOptionsItemSelected(item)
+            else -> return false
         }
     }
 }

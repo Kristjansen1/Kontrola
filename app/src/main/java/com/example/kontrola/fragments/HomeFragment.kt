@@ -53,6 +53,7 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
         }
         val fab = FragmentHomeBinding.bind(view).fab
         fab.setOnClickListener {
+            viewModel.setItemAddEdit(null)
             Navigation.findNavController(it).navigate(R.id.action_homeFragment_to_addErrorFragment)
         }
 
@@ -64,33 +65,33 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
 
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setMenu()
+        setMenu(view)
     }
 
     override fun onItemLongClick(item: Error1, position: Int) {
-        counter++
-        Log.d("longclick","setselected $counter")
 
         val holder = recyclerView.findViewHolderForAdapterPosition(position)
         val oldHolder = recyclerView.findViewHolderForAdapterPosition(lastLongClickSelection)
         lateinit var oldItemLayout: LinearLayout
+
         if (oldHolder != null) {
                 oldItemLayout = (oldHolder as MainRVAdapter.ViewHolder).itemLayout
         }
         val itemLayout = (holder as MainRVAdapter.ViewHolder).itemLayout
 
         if (lastLongClickSelection == position) {
-            Log.d("setvisibility","prva")
 
+            viewModel.setItemAddEdit(null)
             setEditIconVisibility(false)
             setSelected(itemLayout,Color.TRANSPARENT)
             lastLongClickSelection = -1
 
         } else if ((lastLongClickSelection != position) && (lastLongClickSelection > -1)) {
-            Log.d("setvisibility","druga")
 
+            viewModel.setItemAddEdit(item)
             setEditIconVisibility(true)
             setSelected(itemLayout,Color.parseColor("#2596BE"))
+
             if (oldHolder != null) {
                 setSelected(oldItemLayout,Color.TRANSPARENT,false)
 
@@ -98,7 +99,7 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
             lastLongClickSelection = position
 
         } else {
-            Log.d("setvisibility","tretja")
+            viewModel.setItemAddEdit(item)
             setEditIconVisibility(true)
             setSelected(itemLayout,Color.parseColor("#2596BE"))
             lastLongClickSelection = position
@@ -107,11 +108,12 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
 
     }
     private fun setEditIconVisibility(visible: Boolean) {
-        Log.d("setvisibility","setvisibility $counter")
         menuHost.addMenuProvider(object: MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                //menuHost.removeMenuProvider(this)
+                menuHost.removeMenuProvider(this)
+                Log.d("menuprovider","clikikii")
                 menu.findItem(R.id.editItem).isVisible = visible
+                menu.findItem(R.id.deleteItem).isVisible = visible
             }
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return false
@@ -120,7 +122,7 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
 
         },viewLifecycleOwner )
     }
-    private fun setMenu() {
+    private fun setMenu(view: View) {
         menuHost = requireActivity()
         menuHost.invalidateMenu()
         menuHost.addMenuProvider(object: MenuProvider {
@@ -130,9 +132,23 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
                 menu.findItem(R.id.settings).isVisible = true
                 menu.findItem(R.id.export).isVisible = true
                 menu.findItem(R.id.editItem).isVisible = false
+                menu.findItem(R.id.deleteItem).isVisible = false
             }
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return false
+                return when (menuItem.itemId) {
+                    R.id.editItem -> {
+                        Log.d("click","clikikii")
+                        Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_addErrorFragment)
+                        true
+                    }
+                    R.id.deleteItem -> {
+                        viewModel.deleteError(viewModel.itemAddEdit.value!!)
+                        setEditIconVisibility(false)
+                        true
+                    }
+                    else -> return false
+                }
+
             }
 
         },viewLifecycleOwner )
@@ -163,75 +179,28 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
 
 
 
-    private fun populateDB() {
+/*    private fun populateDB() {
         val list = ArrayList<Error1>()
-
         var datum: String
         var posel: String
         var serijska: String
         var napaka: String
         var opomba: String
 
-        val dodajnapako = Error1(
 
-            null,
-            datum = "21. 2. 2023",
-            posel = "A11*8645",
-            serijska = "845",
-            napaka = "Vezava razvodnice",
-            opomba = "Nevtralni vodnik od senzorja vezan na VS sponko"
-        )
+        for (i in 1..200) {
+            val dodajnapako = Error1(
+                null,
+                datum = "$i. 2. 2023",
+                posel = "A11*8645",
+                serijska = "845",
+                napaka = "Vezava razvodnice",
+                opomba = "Nevtralni vodnik od senzorja vezan na VS sponko"
+            )
+            list.add(dodajnapako)
 
-
-
-        list.add(dodajnapako)
-
-        datum = "22. 2. 2023"
-        posel = "A11*8645"
-        serijska = "321"
-        napaka = "Vezava razvodnice"
-        opomba = "Nevtralni vodnik od senzorja vezan na VS sponko"
-
-        list.add(Error1(null,datum,posel,serijska,napaka,opomba,false))
-
-
-        datum = "23. 2. 2023"
-        posel = "A11*4545"
-        serijska = "844"
-        napaka = "Vezava razvodnice"
-        opomba = "Pozabljena brika"
-
-        list.add(Error1(null,datum,posel,serijska,napaka,opomba,false))
-
-
-        datum = "24. 2. 2023"
-        posel = "A11*9845"
-        serijska = "748"
-        napaka = "CEE Priklop"
-        opomba = "Nezategnjeni vijaki na dovodu"
-
-        list.add(Error1(null,datum,posel,serijska,napaka,opomba,false))
-
-
-        datum = "25. 2. 2023"
-        posel = "A11*7445"
-        serijska = "999"
-        napaka = "Kabli"
-        opomba = "Prektratki kabli za pregradno steno"
-
-        list.add(Error1(null,datum,posel,serijska,napaka,opomba,false))
-
-
-        datum = "26. 2. 2023"
-        posel = "A11*5545"
-        serijska = "478"
-        napaka = "Razdelilec"
-        opomba = "Napačne varovalke"
-
-        list.add(Error1(null,datum,posel,serijska,napaka,opomba,false))
-
-
+        }
         viewModel.addError(list)
 
-    }
+    }*/
 }

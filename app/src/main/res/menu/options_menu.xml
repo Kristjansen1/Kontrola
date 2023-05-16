@@ -8,6 +8,12 @@
         android:visible="true"
         app:showAsAction="always" />
     <item
+        android:id="@+id/deleteItem"
+        android:icon="@drawable/delete_48px"
+        android:title="Delete"
+        android:visible="true"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/addError"
         android:title="Add"
         app:showAsAction="always" />

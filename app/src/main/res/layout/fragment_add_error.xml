@@ -75,7 +75,8 @@
             android:id="@+id/txt_serijska"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:hint="@string/fragment_add_error_hint_serijska" />
+            android:hint="@string/fragment_add_error_hint_serijska"
+            android:inputType="number" />
     </com.google.android.material.textfield.TextInputLayout>
 
     <Spinner
@@ -130,7 +131,7 @@
         app:layout_constraintTop_toBottomOf="@+id/textViewErrorDesc">
 
         <EditText
-            android:id="@+id/editTextTextMultiLine6"
+            android:id="@+id/txtOpomba"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:layout_weight="1"

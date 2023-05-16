@@ -14,6 +14,7 @@ import android.view.ViewGroup
 import android.widget.AdapterView.OnItemClickListener
 import androidx.core.content.ContextCompat.getSystemService
 import androidx.recyclerview.widget.RecyclerView
+import com.example.kontrola.ErrorCodes
 import com.example.kontrola.databinding.ErrorListBinding
 import com.example.kontrola.model.Error1
 
@@ -82,8 +83,12 @@ class MainRVAdapter(private val listener: OnItemClickListener) :  RecyclerView.A
         return allError.size
     }
 
+    override fun onViewRecycled(holder: ViewHolder) {
+        val x = holder.date.text
+        Log.d("recycled",x.toString())
+    }
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-
+        Log.d("recycled","onbind: ${holder.date.text}")
         if (lastLongClickPosition == position) {
             holder.itemLayout.setBackgroundColor(Color.parseColor("#2596BE"))
 
@@ -97,11 +102,13 @@ class MainRVAdapter(private val listener: OnItemClickListener) :  RecyclerView.A
             holder.expandedLayout.visibility = View.GONE
         }
         holder.date.text = allError[position].datum
-        holder.type.text = allError[position].napaka
+        holder.type.text = ErrorCodes.getByCode(allError[position].napaka!!)
         holder.exported.text = allError[position].exported.toString()
         holder.posel.text = allError[position].posel
         holder.serial.text = allError[position].serijska
         holder.note.text = allError[position].opomba
+
+        holder.setIsRecyclable(false)
 
     }
 

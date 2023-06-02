@@ -42,6 +42,8 @@ android {
 
 dependencies {
 
+    implementation "androidx.datastore:datastore-preferences:1.0.0"
+
     //apache poi
     implementation group: 'org.apache.poi', name: 'poi-ooxml', version: '3.17'
     implementation group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '5.1.1'
@@ -52,14 +54,11 @@ dependencies {
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.6.1'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.1'
-    implementation 'androidx.preference:preference:1.2.0'
     implementation 'androidx.navigation:navigation-fragment-ktx:2.5.3'
     implementation 'androidx.navigation:navigation-ui-ktx:2.5.3'
-    implementation 'androidx.core:core-ktx:1.10.0'
-
 
     // Added dependency's
-    def room_version = "2.5.1"
+    def room_version = "2.6.0-alpha01"
 
     implementation("androidx.room:room-ktx:$room_version")
     implementation("androidx.room:room-runtime:$room_version")
@@ -67,7 +66,7 @@ dependencies {
 
     // To use Kotlin annotation processing tool (kapt)
     kapt("androidx.room:room-compiler:$room_version")
-    implementation 'androidx.core:core-ktx:1.10.0'
+    implementation 'androidx.core:core-ktx:1.10.1'
     implementation 'androidx.appcompat:appcompat:1.6.1'
     implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'

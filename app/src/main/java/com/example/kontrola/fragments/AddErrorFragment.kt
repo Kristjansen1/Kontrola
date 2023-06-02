@@ -31,6 +31,7 @@ import com.example.kontrola.model.Error1
 import com.example.kontrola.viewmodel.ViewModel
 import java.time.LocalDate
 import java.util.Calendar
+import kotlin.properties.Delegates
 
 class AddErrorFragment : Fragment() {
 
@@ -38,7 +39,7 @@ class AddErrorFragment : Fragment() {
     private val viewModel: ViewModel by activityViewModels()
     private var edit = false
     private lateinit var binding : FragmentAddErrorBinding
-
+    private var idOfItem by Delegates.notNull<Int>()
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navController: NavController
 
@@ -74,7 +75,7 @@ class AddErrorFragment : Fragment() {
             edit = true
             val actionBar = requireActivity() as MainActivity
             actionBar.supportActionBar?.title = "Edit error"
-
+            idOfItem = viewModel.itemAddEdit.value!!.id!!
             datum.text = viewModel.itemAddEdit.value!!.datum
             posel.text = viewModel.itemAddEdit.value!!.posel
             serijska.text = viewModel.itemAddEdit.value!!.serijska
@@ -119,11 +120,11 @@ class AddErrorFragment : Fragment() {
                 when (menuItem.itemId) {
                     R.id.addError -> {
                         //Log.d("adderror","clicked")
-                        addErrorToDb()
+                        addErrorToDb("add")
 
                     }
                     R.id.update -> {
-                        return true
+                        addErrorToDb("update")
                     }
                 }
                 return false
@@ -138,19 +139,22 @@ class AddErrorFragment : Fragment() {
         menuHost.removeMenuProvider(menuProvider)
     }
 
-    private fun addErrorToDb() {
+    private fun addErrorToDb(action: String) {
         counter++
         Log.d("adderror","adderror $counter")
 
         val error: Error1 = Error1(
-            id = null,
+            id = editOrNot(),
             datum = datum.text.toString(),
             posel = posel.text.toString(),
             serijska = serijska.text.toString(),
             napaka = spinnner.selectedItemPosition,
             opomba = opomba.text.toString()
         )
-        viewModel.addError(error)
+        when (action) {
+            "add" ->  viewModel.addError(error)
+            "update" -> viewModel.updateError(error)
+        }
         try {
             val act = requireActivity() as MainActivity
             navHostFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragmentContainerView2) as NavHostFragment
@@ -173,6 +177,15 @@ class AddErrorFragment : Fragment() {
           }*/
 
     }
+
+    private fun editOrNot(): Int? {
+        return if (!edit) {
+            null
+        } else {
+            idOfItem
+        }
+    }
+
     private fun pickDate() {
         val calendar = Calendar.getInstance()
         val year = calendar.get(Calendar.YEAR)

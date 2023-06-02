@@ -6,18 +6,22 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Update
 import com.example.kontrola.model.Error1
 
 @Dao
-interface ErrorDao {
+abstract class ErrorDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(error: Error1)
+    abstract suspend fun insert(error: Error1)
 
     @Query("SELECT * FROM error_table")
-    fun getAllData(): LiveData<List<Error1>>
+    abstract fun getAllData(): LiveData<List<Error1>>
 
     @Delete
-    suspend fun delete(error: Error1)
+    abstract suspend fun delete(error: Error1)
+
+    @Update
+    abstract fun update(error: Error1)
 
 }

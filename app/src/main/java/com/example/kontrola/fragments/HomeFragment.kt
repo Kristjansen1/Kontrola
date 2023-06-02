@@ -24,10 +24,11 @@ import com.example.kontrola.R
 import com.example.kontrola.adapter.MainRVAdapter
 import com.example.kontrola.databinding.FragmentHomeBinding
 import com.example.kontrola.model.Error1
+import com.example.kontrola.viewmodel.ViewModel
 
 class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
 
-    private val viewModel: com.example.kontrola.viewmodel.ViewModel by activityViewModels()
+    private val viewModel: ViewModel by activityViewModels()
     private lateinit var  menuHost: MenuHost
     private lateinit var recyclerView: RecyclerView
     private var lastLongClickSelection = -1
@@ -47,10 +48,12 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
         recyclerView.setHasFixedSize(true)
         val adapter = MainRVAdapter(this)
         recyclerView.adapter = adapter
+        Log.d("applog last",lastLongClickSelection.toString())
 
         viewModel.allError.observe(viewLifecycleOwner) {
             adapter.updateList(it)
         }
+
         val fab = FragmentHomeBinding.bind(view).fab
         fab.setOnClickListener {
             viewModel.setItemAddEdit(null)
@@ -107,13 +110,16 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
         }
 
     }
-    private fun setEditIconVisibility(visible: Boolean) {
+    private fun setEditIconVisibility(visibility: Boolean) {
         menuHost.addMenuProvider(object: MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
                 menuHost.removeMenuProvider(this)
                 Log.d("menuprovider","clikikii")
-                menu.findItem(R.id.editItem).isVisible = visible
-                menu.findItem(R.id.deleteItem).isVisible = visible
+                menu.findItem(R.id.editItem).isVisible = visibility
+                menu.findItem(R.id.deleteItem).isVisible = visibility
+                if (!visibility) {
+                    lastLongClickSelection = -1
+                }
             }
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return false
@@ -139,11 +145,17 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
                     R.id.editItem -> {
                         Log.d("click","clikikii")
                         Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_addErrorFragment)
+                        lastLongClickSelection = -1
                         true
                     }
                     R.id.deleteItem -> {
                         viewModel.deleteError(viewModel.itemAddEdit.value!!)
                         setEditIconVisibility(false)
+                        true
+                    }
+                    R.id.settings -> {
+                        Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_settingsFragment)
+                        lastLongClickSelection = -1
                         true
                     }
                     else -> return false

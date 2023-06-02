@@ -114,6 +114,7 @@ class MainRVAdapter(private val listener: OnItemClickListener) :  RecyclerView.A
 
     @SuppressLint("NotifyDataSetChanged")
     fun updateList(newList: List<Error1>) {
+        lastLongClickPosition = -1
         allError.clear()
         allError.addAll(newList)
         notifyDataSetChanged()

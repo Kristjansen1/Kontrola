@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
 import android.view.MenuItem
-import android.view.TextureView
 import android.view.View
 import android.view.ViewGroup
 import android.widget.DatePicker
@@ -17,15 +16,13 @@ import android.widget.Spinner
 import android.widget.TextView
 import androidx.core.view.MenuHost
 import androidx.core.view.MenuProvider
-import androidx.databinding.DataBindingUtil.setContentView
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.NavController
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
 import com.example.kontrola.MainActivity
 import com.example.kontrola.R
-import com.example.kontrola.Util
+import com.example.kontrola.util.Util
 import com.example.kontrola.databinding.FragmentAddErrorBinding
 import com.example.kontrola.model.Error1
 import com.example.kontrola.viewmodel.ViewModel
@@ -35,17 +32,17 @@ import kotlin.properties.Delegates
 
 class AddErrorFragment : Fragment() {
 
-    var counter : Int = 0
+    var counter: Int = 0
     private val viewModel: ViewModel by activityViewModels()
     private var edit = false
-    private lateinit var binding : FragmentAddErrorBinding
+    private lateinit var binding: FragmentAddErrorBinding
     private var idOfItem by Delegates.notNull<Int>()
     private lateinit var navHostFragment: NavHostFragment
     private lateinit var navController: NavController
 
 
     private lateinit var datum: TextView
-    private lateinit var calendarImage : ImageView
+    private lateinit var calendarImage: ImageView
     private lateinit var posel: TextView
     private lateinit var serijska: TextView
     private lateinit var spinnner: Spinner
@@ -95,24 +92,22 @@ class AddErrorFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 
-        //super.onViewCreated(view, savedInstanceState)
-
         viewHolder = view
+        menuHost = requireActivity()
 
-
-        menuHost =  requireActivity()
-        menuHost.invalidateMenu()
-        menuHost.addMenuProvider(object: MenuProvider{
+        menuHost.addMenuProvider(object : MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                //menuInflater.inflate(R.menu.options_menu, menu)
+
                 menuProvider = this
 
-                menu.findItem(R.id.update).isVisible = edit
-                menu.findItem(R.id.addError).isVisible = !edit
-                menu.findItem(R.id.settings).isVisible = false
-                menu.findItem(R.id.export).isVisible = false
-                menu.findItem(R.id.editItem).isVisible = false
-                menu.findItem(R.id.deleteItem).isVisible = false
+                viewModel.apply {
+                    setMenuUpdateIconVisibility(edit)
+                    setMenuAddIconVisibility(!edit)
+                    setMenuSettingsIconVisibility(false)
+                    setMenuDeleteIconVisibility(false)
+                    setMenuExportIconVisibility(false)
+                    setMenuEditItemIconVisibility(false)
+                }
 
             }
 
@@ -123,25 +118,25 @@ class AddErrorFragment : Fragment() {
                         addErrorToDb("add")
 
                     }
+
                     R.id.update -> {
                         addErrorToDb("update")
                     }
                 }
                 return false
             }
-
-            } )
+        })
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
-        Log.d("adderror","destroy")
+        Log.d("adderror", "destroy")
         menuHost.removeMenuProvider(menuProvider)
     }
 
     private fun addErrorToDb(action: String) {
         counter++
-        Log.d("adderror","adderror $counter")
+        Log.d("adderror", "adderror $counter")
 
         val error: Error1 = Error1(
             id = editOrNot(),
@@ -152,21 +147,18 @@ class AddErrorFragment : Fragment() {
             opomba = opomba.text.toString()
         )
         when (action) {
-            "add" ->  viewModel.addError(error)
+            "add" -> viewModel.addError(error)
             "update" -> viewModel.updateError(error)
         }
         try {
             val act = requireActivity() as MainActivity
-            navHostFragment = requireActivity().supportFragmentManager.findFragmentById(R.id.fragmentContainerView2) as NavHostFragment
+            navHostFragment =
+                requireActivity().supportFragmentManager.findFragmentById(R.id.fragmentContainerView2) as NavHostFragment
             navController = navHostFragment.findNavController()
             navHostFragment.navController.navigate(R.id.action_addErrorFragment_to_homeFragment)
-        }catch (e: java.lang.IllegalArgumentException) {
+        } catch (e: java.lang.IllegalArgumentException) {
             e.printStackTrace()
         }
-
-
-
-
 
 
         /*  try {
@@ -195,7 +187,7 @@ class AddErrorFragment : Fragment() {
         DatePickerDialog(
             requireContext(),
             { _: DatePicker, mYear: Int, mMonth: Int, mDay: Int ->
-                val fixMonth = mMonth+1
+                val fixMonth = mMonth + 1
                 val date = "$mDay. $fixMonth. $mYear"
                 datum.text = date
             },

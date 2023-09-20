@@ -1,4 +1,4 @@
-package com.example.kontrola
+package com.example.kontrola.util
 
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter

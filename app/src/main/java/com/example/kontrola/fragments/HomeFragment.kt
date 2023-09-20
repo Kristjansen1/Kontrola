@@ -24,12 +24,15 @@ import com.example.kontrola.R
 import com.example.kontrola.adapter.MainRVAdapter
 import com.example.kontrola.databinding.FragmentHomeBinding
 import com.example.kontrola.model.Error1
+import com.example.kontrola.util.Poi
 import com.example.kontrola.viewmodel.ViewModel
 
 class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
 
     private val viewModel: ViewModel by activityViewModels()
-    private lateinit var  menuHost: MenuHost
+    private lateinit var menuHost: MenuHost
+    private lateinit var menuProvider: MenuProvider
+    private lateinit var thisMenu: Menu
     private lateinit var recyclerView: RecyclerView
     private var lastLongClickSelection = -1
     var counter = 0
@@ -60,8 +63,6 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
             Navigation.findNavController(it).navigate(R.id.action_homeFragment_to_addErrorFragment)
         }
 
-
-
         return view
     }
 
@@ -70,7 +71,10 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setMenu(view)
     }
-
+    override fun onDestroyView() {
+        super.onDestroyView()
+        menuHost.removeMenuProvider(menuProvider)
+    }
     override fun onItemLongClick(item: Error1, position: Int) {
 
         val holder = recyclerView.findViewHolderForAdapterPosition(position)
@@ -111,34 +115,26 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
 
     }
     private fun setEditIconVisibility(visibility: Boolean) {
-        menuHost.addMenuProvider(object: MenuProvider {
-            override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menuHost.removeMenuProvider(this)
-                Log.d("menuprovider","clikikii")
-                menu.findItem(R.id.editItem).isVisible = visibility
-                menu.findItem(R.id.deleteItem).isVisible = visibility
-                if (!visibility) {
-                    lastLongClickSelection = -1
-                }
-            }
-            override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
-                return false
-            }
 
-
-        },viewLifecycleOwner )
+        viewModel.setMenuEditItemIconVisibility(visibility)
+        viewModel.setMenuDeleteIconVisibility(visibility)
+        if (!visibility) {
+            lastLongClickSelection = -1
+        }
     }
     private fun setMenu(view: View) {
         menuHost = requireActivity()
-        menuHost.invalidateMenu()
         menuHost.addMenuProvider(object: MenuProvider {
             override fun onCreateMenu(menu: Menu, menuInflater: MenuInflater) {
-                menu.findItem(R.id.addError).isVisible = false
-                menu.findItem(R.id.update).isVisible = false
-                menu.findItem(R.id.settings).isVisible = true
-                menu.findItem(R.id.export).isVisible = true
-                menu.findItem(R.id.editItem).isVisible = false
-                menu.findItem(R.id.deleteItem).isVisible = false
+                thisMenu = menu
+                menuProvider = this
+
+                viewModel.setMenuUpdateIconVisibility(false)
+                viewModel.setMenuAddIconVisibility(false)
+                viewModel.setMenuSettingsIconVisibility(true)
+                viewModel.setMenuDeleteIconVisibility(false)
+                viewModel.setMenuExportIconVisibility(true)
+                viewModel.setMenuEditItemIconVisibility(false)
             }
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
                 return when (menuItem.itemId) {
@@ -154,8 +150,13 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
                         true
                     }
                     R.id.settings -> {
-                        Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_settingsFragment)
+                        //Navigation.findNavController(view).navigate(R.id.action_homeFragment_to_settingsFragment)
                         lastLongClickSelection = -1
+                        true
+                    }
+                    R.id.export -> {
+                        Poi.export(requireActivity().application)
+                        //exportTable()
                         true
                     }
                     else -> return false
@@ -165,6 +166,12 @@ class HomeFragment : Fragment(),MainRVAdapter.OnItemClickListener {
 
         },viewLifecycleOwner )
     }
+
+    private fun exportTable(): Boolean {
+
+        return true
+    }
+
     private fun setSelected(layout: LinearLayout, color: Int,vibrate: Boolean = true) {
         layout.setBackgroundColor(color)
         if (vibrate) {

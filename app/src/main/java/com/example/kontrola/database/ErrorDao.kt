@@ -18,6 +18,9 @@ abstract class ErrorDao {
     @Query("SELECT * FROM error_table")
     abstract fun getAllData(): LiveData<List<Error1>>
 
+    @Query("SELECT * FROM error_table WHERE exported=:value")
+    abstract fun getExportedFalse(value: Boolean): List<Error1>
+
     @Delete
     abstract suspend fun delete(error: Error1)
 
